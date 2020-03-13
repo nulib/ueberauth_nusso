@@ -17,6 +17,7 @@ defmodule UeberauthOpenam.MixProject do
       source_url: @url,
       homepage_url: @url,
       deps: deps(),
+      docs: docs(),
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
@@ -40,13 +41,20 @@ defmodule UeberauthOpenam.MixProject do
   defp deps do
     [
       {:credo, "~> 1.3.0", only: [:dev, :test]},
-      {:earmark, "~> 1.2", only: :docs},
-      {:ex_doc, "~> 0.19", only: :docs},
+      {:earmark, "~> 1.2", only: [:dev, :docs]},
+      {:ex_doc, "~> 0.19", only: [:dev, :docs]},
       {:excoveralls, "~> 0.12.2", only: :test},
       {:httpoison, ">= 0.0.0"},
       {:jason, "~> 1.1.2"},
       {:mox, "~> 0.5.2", only: :test},
       {:ueberauth, ">= 0.2.0"}
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      extras: ["README.md"]
     ]
   end
 
