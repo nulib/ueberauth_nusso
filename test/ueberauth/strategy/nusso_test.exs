@@ -10,17 +10,20 @@ defmodule Ueberauth.Strategy.NuSSOTest do
   end
 
   test "redirect callback redirects to login url" do
-    conn = conn(:get, "/login") |> NuSSO.handle_request!()
+    conn = conn(:get, "/login") |> init_test_session(%{}) |> NuSSO.handle_request!()
     assert conn.status == 302
   end
 
   test "login callback without token shows an error" do
-    conn = %Plug.Conn{cookies: %{}} |> NuSSO.handle_callback!()
+    conn = %Plug.Conn{cookies: %{}} |> init_test_session(%{}) |> NuSSO.handle_callback!()
     assert conn.assigns |> Map.has_key?(:ueberauth_failure)
   end
 
   test "error callback" do
-    conn = %Plug.Conn{cookies: %{"nusso" => "error-sso-token"}} |> NuSSO.handle_callback!()
+    conn =
+      %Plug.Conn{cookies: %{"nusso" => "error-sso-token"}}
+      |> init_test_session(%{})
+      |> NuSSO.handle_callback!()
 
     assert conn
            |> dig([:assigns, :ueberauth_failure, :errors, 0, :message]) ==
@@ -28,7 +31,10 @@ defmodule Ueberauth.Strategy.NuSSOTest do
   end
 
   test "invalid callback" do
-    conn = %Plug.Conn{cookies: %{"nusso" => "bad-sso-token"}} |> NuSSO.handle_callback!()
+    conn =
+      %Plug.Conn{cookies: %{"nusso" => "bad-sso-token"}}
+      |> init_test_session(%{})
+      |> NuSSO.handle_callback!()
 
     assert conn
            |> dig([:assigns, :ueberauth_failure, :errors, 0, :message]) ==
@@ -37,7 +43,11 @@ defmodule Ueberauth.Strategy.NuSSOTest do
 
   describe "valid callback" do
     setup do
-      {:ok, conn: %Plug.Conn{cookies: %{"nusso" => "test-sso-token"}} |> NuSSO.handle_callback!()}
+      {:ok,
+       conn:
+         %Plug.Conn{cookies: %{"nusso" => "test-sso-token"}}
+         |> init_test_session(%{})
+         |> NuSSO.handle_callback!()}
     end
 
     test "returns user details", %{conn: conn} do
