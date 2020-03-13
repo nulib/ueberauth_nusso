@@ -19,11 +19,16 @@ defmodule Ueberauth.Strategy.NuSSO do
   alias Ueberauth.Auth.{Extra, Info}
   alias Ueberauth.Strategy.NuSSO
 
+  import Plug.Conn
+
+  @referer_key "nussoReferer"
+
   @doc """
   Ueberauth `request` handler. Redirects to the NuSSO server's login page.
   """
   def handle_request!(conn) do
     conn
+    |> put_session(@referer_key, extract_referer(conn))
     |> redirect!(redirect_url(conn))
   end
 
@@ -31,7 +36,9 @@ defmodule Ueberauth.Strategy.NuSSO do
   Ueberauth after login callback with a valid NuSSO Cookie.
   """
   def handle_callback!(%Plug.Conn{} = conn) do
-    handle_token(conn, conn.cookies[NuSSO.API.sso_cookie()])
+    conn
+    |> reset_referer()
+    |> handle_token(conn.cookies[NuSSO.API.sso_cookie()])
   end
 
   @doc "Ueberauth UID callback."
@@ -93,4 +100,20 @@ defmodule Ueberauth.Strategy.NuSSO do
     token
     |> NuSSO.API.redeem_token()
   end
+
+  defp reset_referer(%Plug.Conn{} = conn) do
+    case conn |> get_session(@referer_key) do
+      nil -> conn
+      value -> conn |> delete_session(@referer_key) |> put_req_header("referer", value)
+    end
+  end
+
+  defp extract_referer(%Plug.Conn{} = conn) do
+    conn
+    |> Plug.Conn.get_req_header("referer")
+    |> extract_referer()
+  end
+
+  defp extract_referer([referer | _]), do: referer
+  defp extract_referer([]), do: "/"
 end
