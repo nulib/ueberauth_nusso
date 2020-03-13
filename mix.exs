@@ -46,7 +46,7 @@ defmodule UeberauthOpenam.MixProject do
       {:httpoison, ">= 0.0.0"},
       {:jason, "~> 1.1.2"},
       {:mox, "~> 0.5.2", only: :test},
-      {:ueberauth, "~> 0.2.0"}
+      {:ueberauth, ">= 0.2.0"}
     ]
   end
 
