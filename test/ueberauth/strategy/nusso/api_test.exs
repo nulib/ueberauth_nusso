@@ -26,7 +26,7 @@ defmodule Ueberauth.Strategy.NuSSO.APITest do
     end
 
     test "login_url/0" do
-      with uri <- API.login_url("https://example.edu/") |> URI.parse(),
+      with uri <- API.login_url("http://example.edu/") |> URI.parse(),
            params <- URI.decode_query(uri.fragment) do
         assert uri.host == "test-nusso.example.edu"
         assert uri.path == "/nusso/XUI/"
@@ -34,7 +34,7 @@ defmodule Ueberauth.Strategy.NuSSO.APITest do
       end
 
       assert_received({:header, {"apikey", "test-consumer-key"}})
-      assert_received({:header, {"goto", "https://example.edu/"}})
+      assert_received({:header, {"goto", "http://example.edu/"}})
     end
 
     @tag config: [include_attributes: false]
