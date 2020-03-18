@@ -71,6 +71,7 @@ defmodule Ueberauth.Strategy.NuSSO do
 
   defp redirect_url(conn) do
     callback_url(conn)
+    |> NuSSO.API.force_https()
     |> NuSSO.API.login_url()
   end
 
@@ -112,6 +113,7 @@ defmodule Ueberauth.Strategy.NuSSO do
     conn
     |> Plug.Conn.get_req_header("referer")
     |> extract_referer()
+    |> NuSSO.API.force_https()
   end
 
   defp extract_referer([referer | _]), do: referer

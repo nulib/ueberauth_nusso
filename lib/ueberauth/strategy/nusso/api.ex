@@ -26,6 +26,17 @@ defmodule Ueberauth.Strategy.NuSSO.API do
   @doc "Retrieve the configured SSO cookie header name"
   def sso_cookie, do: settings(:sso_cookie, "nusso")
 
+  def force_https(url) do
+    with port <- settings(:ssl_port, 443) do
+      case url |> URI.parse() do
+        %URI{scheme: "https"} = uri -> uri
+        uri -> %{uri | scheme: "https", port: port}
+      end
+      |> URI.to_string()
+    end
+  end
+
+
   defp consumer_key, do: settings(:consumer_key)
 
   defp get_directory_attributes(token, extra) do
