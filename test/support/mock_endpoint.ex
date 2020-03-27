@@ -19,7 +19,10 @@ defmodule Ueberauth.NuSSO.MockEndpoint do
 
   def get("#{@base_url}/validate-with-directory-search-response", headers) do
     send_headers(headers)
+    headers |> Enum.into(%{}) |> get_in(["webssotoken"]) |> directory_search_response()
+  end
 
+  defp directory_search_response("test-sso-token") do
     http_response(%{
       "results" => [
         %{
@@ -39,7 +42,17 @@ defmodule Ueberauth.NuSSO.MockEndpoint do
     })
   end
 
+  defp directory_search_response("bad-directory-sso-token") do
+    {:ok,
+     %HTTPoison.Response{
+       status_code: 500,
+       body:
+         ~s[{"fault":{"faultstring":"Execution of ServiceCallout Call-Directory-Search failed. Reason: ResponseCode 404 is treated as error","detail":{"errorcode":"steps.servicecallout.ExecutionFailed"}}}]
+     }}
+  end
+
   defp validate_response("test-sso-token"), do: http_response(%{netid: "abc123"})
+  defp validate_response("bad-directory-sso-token"), do: http_response(%{netid: "abc123"})
   defp validate_response("bad-sso-token"), do: http_response(407, %{redirecturl: @redirecturl})
   defp validate_response("error-sso-token"), do: http_response(500, "Server Error")
 

@@ -63,9 +63,9 @@ defmodule Ueberauth.Strategy.NuSSO do
     user = conn.private.nusso_user
 
     %Info{
-      email: user.mail,
-      name: Enum.join([user.givenName, user.sn], " "),
-      nickname: user.uid
+      email: user |> Map.get(:mail),
+      name: Enum.join([user |> Map.get(:givenName), user |> Map.get(:sn)], " "),
+      nickname: user |> Map.get(:uid)
     }
   end
 
