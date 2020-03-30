@@ -3,6 +3,9 @@ defmodule Ueberauth.Strategy.NuSSO.API do
   NuSSO server API implementation.
   """
 
+  @directory_failure ~s[{"fault":{"faultstring":"Execution of ServiceCallout Call-Directory-Search failed. Reason: ResponseCode 404 is treated as error","detail":{"errorcode":"steps.servicecallout.ExecutionFailed"}}}]
+  @netid_email_domain "e.northwestern.edu"
+
   @doc "Returns the URL to the NuSSO server's login page"
   def login_url(callback) do
     with {:ok, response} <- get("get-ldap-redirect-url", goto: callback) do
@@ -36,19 +39,22 @@ defmodule Ueberauth.Strategy.NuSSO.API do
     end
   end
 
-
   defp consumer_key, do: settings(:consumer_key)
 
   defp get_directory_attributes(token, extra) do
     with {:ok, response} <- get("validate-with-directory-search-response", webssotoken: token) do
       {
         :ok,
-        response |> handle_directory_attribute_response() |> Map.merge(extra)
+        response |> handle_directory_attribute_response(extra)
       }
     end
   end
 
-  defp handle_directory_attribute_response(response) do
+  defp handle_directory_attribute_response(%{results: []}, extra) do
+    extra[:uid] |> netid_user()
+  end
+
+  defp handle_directory_attribute_response(response, extra) do
     response
     |> Map.get(:results)
     |> List.first()
@@ -61,6 +67,7 @@ defmodule Ueberauth.Strategy.NuSSO.API do
     |> Enum.reject(&is_nil/1)
     |> Enum.into(%{})
     |> atomify()
+    |> Map.merge(extra)
   end
 
   defp settings(key, default \\ nil) do
@@ -93,6 +100,10 @@ defmodule Ueberauth.Strategy.NuSSO.API do
     {:error, %{exception: "Login Failed", message: "Missing, invalid, or expired SSO Token"}}
   end
 
+  defp handle_response({:ok, %HTTPoison.Response{status_code: 500, body: @directory_failure}}) do
+    {:ok, %{results: []}}
+  end
+
   defp handle_response({:ok, %HTTPoison.Response{status_code: status_code, body: body}}) do
     {:error, %{exception: "Unknown Response", status_code: status_code, message: body}}
   end
@@ -110,5 +121,15 @@ defmodule Ueberauth.Strategy.NuSSO.API do
       {key, value} when is_binary(key) -> {String.to_atom(key), value}
     end)
     |> Enum.into(%{})
+  end
+
+  defp netid_user(net_id) do
+    %{
+      uid: net_id,
+      displayName: net_id,
+      givenName: net_id,
+      sn: "(NetID)",
+      mail: "#{net_id}@#{@netid_email_domain}"
+    }
   end
 end
