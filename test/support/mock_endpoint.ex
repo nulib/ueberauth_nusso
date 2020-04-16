@@ -51,9 +51,13 @@ defmodule Ueberauth.NuSSO.MockEndpoint do
      }}
   end
 
+  defp directory_search_response("empty-directory-sso-token"),
+    do: {:ok, %HTTPoison.Response{status_code: 200, body: ""}}
+
   defp validate_response("test-sso-token"), do: http_response(%{netid: "abc123"})
   defp validate_response("bad-directory-sso-token"), do: http_response(%{netid: "abc123"})
   defp validate_response("bad-sso-token"), do: http_response(407, %{redirecturl: @redirecturl})
+  defp validate_response("empty-directory-sso-token"), do: http_response(%{netid: "abc123"})
   defp validate_response("error-sso-token"), do: http_response(500, "Server Error")
 
   defp send_headers(headers) do
