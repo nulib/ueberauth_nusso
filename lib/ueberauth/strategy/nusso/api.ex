@@ -92,6 +92,10 @@ defmodule Ueberauth.Strategy.NuSSO.API do
     end
   end
 
+  defp handle_response({:ok, %HTTPoison.Response{status_code: 200, body: ""}}) do
+    {:ok, %{results: []}}
+  end
+
   defp handle_response({:ok, %HTTPoison.Response{status_code: 200, body: body}}) do
     {:ok, Jason.decode!(body) |> atomify()}
   end
