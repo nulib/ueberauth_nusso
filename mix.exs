@@ -40,13 +40,13 @@ defmodule UeberauthOpenam.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:credo, "~> 1.3.0", only: [:dev, :test]},
+      {:credo, "~> 1.3", only: [:dev, :test]},
       {:earmark, "~> 1.2", only: [:dev, :docs]},
       {:ex_doc, "~> 0.19", only: [:dev, :docs]},
-      {:excoveralls, "~> 0.12.2", only: :test},
+      {:excoveralls, "~> 0.12", only: :test},
       {:httpoison, ">= 0.0.0"},
       {:jason, "~> 1.0"},
-      {:mox, "~> 0.5.2", only: :test},
+      {:mox, ">= 0.0.0", only: :test},
       {:ueberauth, ">= 0.2.0"}
     ]
   end
