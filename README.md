@@ -1,7 +1,7 @@
 # Ueberauth Strategy for Northwestern University Agentless SSO
 
 [![Build](https://github.com/nulib/ueberauth_nusso/actions/workflows/build.yml/badge.svg)](https://github.com/nulib/ueberauth_nusso/actions/workflows/build.yml)
-[![Coverage](https://coveralls.io/repos/github/nulib/ueberauth_nusso/badge.svg?branch=master)](https://coveralls.io/github/nulib/ueberauth_nusso?branch=master)
+[![Coverage](https://coveralls.io/repos/github/nulib/ueberauth_nusso/badge.svg?branch=main)](https://coveralls.io/github/nulib/ueberauth_nusso?branch=main)
 [![Hex.pm](https://img.shields.io/hexpm/v/ueberauth_nusso.svg)](https://hex.pm/packages/ueberauth_nusso)
 
 Northwestern University Agentless SSO strategy for [Ueberauth](https://github.com/ueberauth/ueberauth)
