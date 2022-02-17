@@ -42,12 +42,13 @@ defmodule Ueberauth.Strategy.NuSSO.API do
   defp consumer_key, do: settings(:consumer_key)
 
   defp get_directory_attributes(token, extra) do
-    with {:ok, response} <- get("validate-with-directory-search-response", webssotoken: token) do
-      {
-        :ok,
-        response |> handle_directory_attribute_response(extra)
-      }
-    end
+    response =
+      case get("validate-with-directory-search-response", webssotoken: token) do
+        {:ok, response} -> response
+        _ -> %{results: []}
+      end
+
+    {:ok, response |> handle_directory_attribute_response(extra)}
   end
 
   defp handle_directory_attribute_response(%{results: []}, extra) do
@@ -61,14 +62,17 @@ defmodule Ueberauth.Strategy.NuSSO.API do
     |> Enum.map(fn
       {_, []} -> nil
       {_, ""} -> nil
-      {key, value} when is_list(value) -> {key, value |> List.first()}
-      {key, value} -> {key, value}
+      {key, value} when is_list(value) -> {to_atom(key), value |> List.first()}
+      {key, value} -> {to_atom(key), value}
     end)
     |> Enum.reject(&is_nil/1)
     |> Enum.into(%{})
-    |> atomify()
     |> Map.merge(extra)
   end
+
+  defp to_atom(key) when is_atom(key), do: key
+  defp to_atom(key) when is_binary(key), do: String.to_atom(key)
+  defp to_atom(key), do: String.to_atom(to_string(key))
 
   defp settings(key, default \\ nil) do
     with {_, settings} <-
@@ -97,7 +101,7 @@ defmodule Ueberauth.Strategy.NuSSO.API do
   end
 
   defp handle_response({:ok, %HTTPoison.Response{status_code: 200, body: body}}) do
-    {:ok, Jason.decode!(body) |> atomify()}
+    Jason.decode(body, keys: :atoms)
   end
 
   defp handle_response({:ok, %HTTPoison.Response{status_code: 407}}) do
@@ -116,15 +120,6 @@ defmodule Ueberauth.Strategy.NuSSO.API do
     settings(:base_url)
     |> URI.merge(path)
     |> URI.to_string()
-  end
-
-  defp atomify(map) when is_map(map) do
-    map
-    |> Enum.map(fn
-      {key, value} when is_atom(key) -> {key, value}
-      {key, value} when is_binary(key) -> {String.to_atom(key), value}
-    end)
-    |> Enum.into(%{})
   end
 
   defp netid_user(net_id) do

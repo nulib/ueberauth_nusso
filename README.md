@@ -14,7 +14,7 @@ Northwestern University Agentless SSO strategy for [Ueberauth](https://github.co
 def deps do
   [
     {:ueberauth, "~> 0.2"},
-    {:ueberauth_nusso, "~> 0.1.0"},
+    {:ueberauth_nusso, "~> 0.3"},
   ]
 end
 ```
