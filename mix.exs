@@ -1,16 +1,17 @@
 defmodule UeberauthOpenam.MixProject do
   use Mix.Project
 
-  @version "0.2.4"
+  @version "0.3.0"
   @url "https://github.com/nulib/ueberauth_nusso"
 
   def project do
     [
       app: :ueberauth_nusso,
       version: @version,
-      elixir: "~> 1.2",
+      elixir: "~> 1.9",
       name: "Ueberauth NuSSO strategy",
       description: "Ueberauth strategy for use with Northwestern University Agentless SSO",
+      xref: [exclude: [Jason]],
       package: package(),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,

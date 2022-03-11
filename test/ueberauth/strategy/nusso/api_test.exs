@@ -78,6 +78,17 @@ defmodule Ueberauth.Strategy.NuSSO.APITest do
       assert_received({:header, {"webssotoken", "empty-directory-sso-token"}})
     end
 
+    test "token validation when directory_search_response/1 returns a bad response" do
+      assert {:ok, user} = API.redeem_token("non-json-sso-token")
+      assert user.uid == "abc123"
+      assert user.displayName == "abc123"
+      assert user.mail == "abc123@e.northwestern.edu"
+      refute user |> Map.has_key?(:eduPersonNickname)
+
+      assert_received({:header, {"apikey", "test-consumer-key"}})
+      assert_received({:header, {"webssotoken", "non-json-sso-token"}})
+    end
+
     test "bad token" do
       assert {:error, response} = API.redeem_token("bad-sso-token")
       assert response.message == "Missing, invalid, or expired SSO Token"

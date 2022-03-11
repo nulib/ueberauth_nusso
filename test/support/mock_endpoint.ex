@@ -5,6 +5,12 @@ defmodule Ueberauth.NuSSO.MockEndpoint do
 
   @behaviour HTTPoison.Base
   @base_url "https://test.example.edu/agentless-websso"
+  @non_json_response """
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+  <html>
+    <body>This is not a JSON response</body>
+  </html>
+  """
   @redirecturl "https://test-nusso.example.edu/nusso/XUI/?#login&realm=test&authIndexType=service&service=ldap-registry&goto=https://example.edu/"
 
   def get("#{@base_url}/get-ldap-redirect-url", headers) do
@@ -54,10 +60,14 @@ defmodule Ueberauth.NuSSO.MockEndpoint do
   defp directory_search_response("empty-directory-sso-token"),
     do: {:ok, %HTTPoison.Response{status_code: 200, body: ""}}
 
+  defp directory_search_response("non-json-sso-token"),
+    do: {:ok, %HTTPoison.Response{status_code: 200, body: @non_json_response}}
+
   defp validate_response("test-sso-token"), do: http_response(%{netid: "abc123"})
   defp validate_response("bad-directory-sso-token"), do: http_response(%{netid: "abc123"})
   defp validate_response("bad-sso-token"), do: http_response(407, %{redirecturl: @redirecturl})
   defp validate_response("empty-directory-sso-token"), do: http_response(%{netid: "abc123"})
+  defp validate_response("non-json-sso-token"), do: http_response(%{netid: "abc123"})
   defp validate_response("error-sso-token"), do: http_response(500, "Server Error")
 
   defp send_headers(headers) do
