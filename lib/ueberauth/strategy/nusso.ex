@@ -14,7 +14,7 @@ defmodule Ueberauth.Strategy.NuSSO do
   5. User can proceed to use the Elixir application.
   """
 
-  use Ueberauth.Strategy
+  use Ueberauth.Strategy, ignores_csrf_attack: true
 
   alias Ueberauth.Auth.{Extra, Info}
   alias Ueberauth.Strategy.NuSSO
