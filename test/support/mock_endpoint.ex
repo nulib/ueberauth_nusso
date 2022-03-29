@@ -11,11 +11,14 @@ defmodule Ueberauth.NuSSO.MockEndpoint do
     <body>This is not a JSON response</body>
   </html>
   """
-  @redirecturl "https://test-nusso.example.edu/nusso/XUI/?#login&realm=test&authIndexType=service&service=ldap-registry&goto=https://example.edu/"
+  @redirecturl "https://test-nusso.example.edu/nusso/XUI/?#login&realm=test&authIndexType=service&service=ldap-registry"
 
   def get("#{@base_url}/get-ldap-redirect-url", headers) do
-    send_headers(headers)
-    http_response(%{redirecturl: @redirecturl})
+    with goto <- headers |> Enum.into(%{}) |> Map.get("goto"),
+         url <- [@redirecturl, "goto=#{goto}"] |> Enum.join("&") do
+      send_headers(headers)
+      http_response(%{redirecturl: url})
+    end
   end
 
   def get("#{@base_url}/validateWebSSOToken", headers) do
@@ -146,6 +149,7 @@ defmodule Ueberauth.NuSSO.MockEndpoint do
   def request(_, _, _, _), do: :noop
   def request(_, _, _), do: :noop
   def request(_, _), do: :noop
+  def request(_), do: :noop
   def start, do: :noop
   def stream_next(_), do: :noop
 end

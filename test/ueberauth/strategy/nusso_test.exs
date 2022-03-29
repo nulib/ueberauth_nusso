@@ -15,7 +15,7 @@ defmodule Ueberauth.Strategy.NuSSOTest do
         conn(:get, "/login")
         |> put_req_header("referer", tags[:referer])
         |> init_test_session(%{})
-        |> NuSSO.handle_request!()
+        |> Ueberauth.Strategy.run_request(NuSSO)
 
       {:ok, %{conn: conn}}
     end
@@ -33,6 +33,27 @@ defmodule Ueberauth.Strategy.NuSSOTest do
     @tag referer: "http://referer.example.edu"
     test "http referer is converted to https", %{conn: conn} do
       assert conn |> get_session("nussoReferer") == "https://referer.example.edu"
+    end
+
+    @tag referer: "https://referer.example.edu"
+    test "callback includes XSRF state parameter if present", %{conn: conn} do
+      %{"goto" => callback} =
+        conn
+        |> Map.get(:resp_headers)
+        |> Enum.into(%{})
+        |> Map.get("location")
+        |> URI.parse()
+        |> Map.get(:fragment)
+        |> URI.decode_query()
+
+      params =
+        case callback |> URI.parse() |> Map.get(:query) do
+          nil -> %{}
+          query -> query |> URI.decode_query()
+        end
+
+      assert params |> Map.get("state", nil) ==
+               conn |> get_in([Access.key(:private), Access.key(:ueberauth_state_param)])
     end
   end
 

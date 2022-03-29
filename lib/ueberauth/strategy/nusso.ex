@@ -14,9 +14,10 @@ defmodule Ueberauth.Strategy.NuSSO do
   5. User can proceed to use the Elixir application.
   """
 
-  use Ueberauth.Strategy, ignores_csrf_attack: true
+  use Ueberauth.Strategy
 
   alias Ueberauth.Auth.{Extra, Info}
+  alias Ueberauth.Strategy.Helpers
   alias Ueberauth.Strategy.NuSSO
 
   import Plug.Conn
@@ -71,8 +72,23 @@ defmodule Ueberauth.Strategy.NuSSO do
 
   defp redirect_url(conn) do
     callback_url(conn)
+    |> include_state(conn)
     |> NuSSO.API.force_https()
     |> NuSSO.API.login_url()
+  end
+
+  defp include_state(url, conn) do
+    with uri <- URI.parse(url) do
+      params =
+        case uri.query do
+          nil -> []
+          query -> query |> URI.decode_query() |> Enum.into([])
+        end
+        |> Helpers.with_state_param(conn)
+
+      %URI{uri | query: URI.encode_query(params)}
+      |> URI.to_string()
+    end
   end
 
   defp handle_token(conn, nil) do
