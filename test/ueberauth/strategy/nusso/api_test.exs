@@ -30,7 +30,7 @@ defmodule Ueberauth.Strategy.NuSSO.APITest do
       assert params = URI.decode_query(uri.fragment)
       assert uri.host == "test-nusso.example.edu"
       assert uri.path == "/nusso/XUI/"
-      assert params |> Map.get("goto") == "https://example.edu/"
+      assert params |> Map.get("goto") == "http://example.edu/"
 
       assert_received({:header, {"apikey", "test-consumer-key"}})
       assert_received({:header, {"goto", "http://example.edu/"}})
