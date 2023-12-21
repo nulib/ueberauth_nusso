@@ -24,7 +24,9 @@ defmodule UeberauthOpenam.MixProject do
         "coveralls.detail": :test,
         "coveralls.post": :test,
         "coveralls.html": :test,
-        credo: :test
+        credo: :test,
+        "hex.docs": :docs,
+        "hex.publish": :docs
       ],
       test_coverage: [tool: ExCoveralls],
       elixirc_paths: elixirc_paths(Mix.env())
@@ -34,7 +36,6 @@ defmodule UeberauthOpenam.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      applications: [:ueberauth],
       extra_applications: [:logger, :httpoison]
     ]
   end

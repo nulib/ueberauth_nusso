@@ -1,11 +1,12 @@
 defmodule Ueberauth.Strategy.NuSSOTest do
   use ExUnit.Case
   use Plug.Test
+  alias Ueberauth.NuSSO.MockEndpoint
   alias Ueberauth.Strategy.NuSSO
   import Ueberauth.NuSSO.TestHelpers
 
   setup do
-    stub_endpoint()
+    Mox.stub_with(HTTPMock, MockEndpoint)
     :ok
   end
 
