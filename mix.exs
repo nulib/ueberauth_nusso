@@ -34,7 +34,6 @@ defmodule UeberauthOpenam.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      applications: [:ueberauth],
       extra_applications: [:logger, :httpoison]
     ]
   end

@@ -1,27 +1,17 @@
 defmodule Ueberauth.Strategy.NuSSO.APITest do
   use ExUnit.Case
+  alias Ueberauth.NuSSO.MockEndpoint
   alias Ueberauth.Strategy.NuSSO.API
-  import Ueberauth.NuSSO.TestHelpers
 
   describe "API" do
     setup tags do
-      with old_config <- Application.get_env(:ueberauth, Ueberauth),
-           {provider, settings} <- old_config |> get_in([:providers, :nusso]) do
-        if tags[:config] do
-          Application.put_env(
-            :ueberauth,
-            Ueberauth,
-            old_config
-            |> put_in([:providers, :nusso], {provider, settings |> Keyword.merge(tags[:config])})
-          )
-        end
-
-        on_exit(fn ->
-          Application.put_env(:ueberauth, Ueberauth, old_config)
-        end)
+      with old_config <- Application.get_env(:ueberauth, Ueberauth.Strategy.NuSSO),
+           new_config <- Keyword.merge(old_config, Map.get(tags, :config, [])) do
+        Application.put_env(:ueberauth, Ueberauth.Strategy.NuSSO, new_config)
+        on_exit(fn -> Application.put_env(:ueberauth, Ueberauth.Strategy.NuSSO, old_config) end)
       end
 
-      stub_endpoint()
+      Mox.stub_with(HTTPMock, MockEndpoint)
       :ok
     end
 
