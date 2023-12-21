@@ -1,14 +1,14 @@
 defmodule UeberauthOpenam.MixProject do
   use Mix.Project
 
-  @version "1.0.0"
+  @version "2.0.0"
   @url "https://github.com/nulib/ueberauth_nusso"
 
   def project do
     [
       app: :ueberauth_nusso,
       version: @version,
-      elixir: "~> 1.9",
+      elixir: "~> 1.12",
       name: "Ueberauth NuSSO strategy",
       description: "Ueberauth strategy for use with Northwestern University Agentless SSO",
       xref: [exclude: [Jason]],
@@ -23,7 +23,8 @@ defmodule UeberauthOpenam.MixProject do
         coveralls: :test,
         "coveralls.detail": :test,
         "coveralls.post": :test,
-        "coveralls.html": :test
+        "coveralls.html": :test,
+        credo: :test
       ],
       test_coverage: [tool: ExCoveralls],
       elixirc_paths: elixirc_paths(Mix.env())
@@ -41,14 +42,14 @@ defmodule UeberauthOpenam.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:credo, "~> 1.3", only: [:dev, :test]},
-      {:earmark, "~> 1.2", only: [:dev, :docs]},
-      {:ex_doc, "~> 0.19", only: [:dev, :docs]},
+      {:credo, "~> 1.3", only: :test},
+      {:earmark, "~> 1.2", only: :docs},
+      {:ex_doc, "~> 0.19", only: :docs},
       {:excoveralls, "~> 0.12", only: :test},
       {:httpoison, ">= 0.0.0"},
       {:jason, "~> 1.0"},
-      {:mox, ">= 0.0.0", only: :test},
-      {:ueberauth, ">= 0.7.0"}
+      {:mox, ">= 1.0.0", only: :test},
+      {:ueberauth, "~> 0.10.0 and <= 0.10.5 or >= 0.10.7"}
     ]
   end
 

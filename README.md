@@ -31,11 +31,12 @@ end
 
 ```elixir
 config :ueberauth, Ueberauth,
-  providers: [nusso: {Ueberauth.Strategy.NuSSO, [
-    base_url: "http://websso.example.com/",
-    consumer_key: "AGENTLESS_SSO_CONSUMER_KEY",
-    include_attributes: true
-  ]}]
+  providers: [nusso: {Ueberauth.Strategy.NuSSO, []}]
+
+config :ueberauth, Ueberauth.Strategy.NuSSO,
+  base_url: "http://websso.example.com/",
+  consumer_key: "AGENTLESS_SSO_CONSUMER_KEY",
+  include_attributes: true
 ```
 
   4. In `AuthController` use the NuSSO strategy in your `login/4` function:

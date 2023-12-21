@@ -75,10 +75,8 @@ defmodule Ueberauth.Strategy.NuSSO.API do
   defp to_atom(key), do: String.to_atom(to_string(key))
 
   defp settings(key, default \\ nil) do
-    with {_, settings} <-
-           Application.get_env(:ueberauth, Ueberauth) |> get_in([:providers, :nusso]) do
-      settings |> Keyword.get(key, default)
-    end
+    Application.get_env(:ueberauth, Ueberauth.Strategy.NuSSO, [])
+    |> Keyword.get(key, default)
   end
 
   defp get(path, headers) do
