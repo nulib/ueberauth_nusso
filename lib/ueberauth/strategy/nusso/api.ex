@@ -8,14 +8,14 @@ defmodule Ueberauth.Strategy.NuSSO.API do
 
   @doc "Returns the URL to the NuSSO server's login page"
   def login_url(callback) do
-    with {:ok, response} <- get("/agentless-websso/get-ldap-redirect-url", goto: callback) do
+    with {:ok, response} <- get("/agentless-websso/get-ldap-duo-redirect-url", goto: callback) do
       response |> Map.get(:redirecturl)
     end
   end
 
   @doc "Redeem an NuSSO SSO Token for the user attributes"
   def redeem_token(token) do
-    case get("/agentless-websso/validateWebSSOToken", webssotoken: token) do
+    case get("/agentless-websso/validateWebSSOToken", webssotoken: token, requiresMFA: true) do
       {:ok, %{netid: netid}} ->
         if settings(:include_attributes, false),
           do: get_directory_attributes(%{uid: netid}, token),
@@ -62,7 +62,7 @@ defmodule Ueberauth.Strategy.NuSSO.API do
     |> Enum.map(fn
       {_, []} -> nil
       {_, ""} -> nil
-      {key, value} when is_list(value) -> {to_atom(key), value |> List.first()}
+      {key, [value]} -> {to_atom(key), value}
       {key, value} -> {to_atom(key), value}
     end)
     |> Enum.reject(&is_nil/1)

@@ -13,7 +13,7 @@ defmodule Ueberauth.NuSSO.MockEndpoint do
   """
   @redirecturl "https://test-nusso.example.edu/nusso/XUI/?#login&realm=test&authIndexType=service&service=ldap-registry"
 
-  def get("#{@base_url}/agentless-websso/get-ldap-redirect-url", headers) do
+  def get("#{@base_url}/agentless-websso/get-ldap-duo-redirect-url", headers) do
     with goto <- headers |> Enum.into(%{}) |> Map.get("goto"),
          url <- [@redirecturl, "goto=#{goto}"] |> Enum.join("&") do
       send_headers(headers)
