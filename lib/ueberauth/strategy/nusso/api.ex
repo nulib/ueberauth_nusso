@@ -8,14 +8,14 @@ defmodule Ueberauth.Strategy.NuSSO.API do
 
   @doc "Returns the URL to the NuSSO server's login page"
   def login_url(callback) do
-    with {:ok, response} <- get("get-ldap-redirect-url", goto: callback) do
+    with {:ok, response} <- get("get-ldap-duo-redirect-url", goto: callback) do
       response |> Map.get(:redirecturl)
     end
   end
 
   @doc "Redeem an NuSSO SSO Token for the user attributes"
   def redeem_token(token) do
-    case get("validateWebSSOToken", webssotoken: token) do
+    case get("validateWebSSOToken", webssotoken: token, requiresMFA: true) do
       {:ok, %{netid: netid}} ->
         if settings(:include_attributes, false),
           do: get_directory_attributes(token, %{uid: netid}),
