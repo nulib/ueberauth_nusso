@@ -4,7 +4,7 @@ defmodule Ueberauth.NuSSO.MockEndpoint do
   """
 
   @behaviour HTTPoison.Base
-  @base_url "https://test.example.edu/agentless-websso"
+  @base_url "https://test.example.edu"
   @non_json_response """
   <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
   <html>
@@ -13,7 +13,7 @@ defmodule Ueberauth.NuSSO.MockEndpoint do
   """
   @redirecturl "https://test-nusso.example.edu/nusso/XUI/?#login&realm=test&authIndexType=service&service=ldap-registry"
 
-  def get("#{@base_url}/get-ldap-redirect-url", headers) do
+  def get("#{@base_url}/agentless-websso/get-ldap-redirect-url", headers) do
     with goto <- headers |> Enum.into(%{}) |> Map.get("goto"),
          url <- [@redirecturl, "goto=#{goto}"] |> Enum.join("&") do
       send_headers(headers)
@@ -21,12 +21,12 @@ defmodule Ueberauth.NuSSO.MockEndpoint do
     end
   end
 
-  def get("#{@base_url}/validateWebSSOToken", headers) do
+  def get("#{@base_url}/agentless-websso/validateWebSSOToken", headers) do
     send_headers(headers)
     headers |> Enum.into(%{}) |> get_in(["webssotoken"]) |> validate_response()
   end
 
-  def get("#{@base_url}/validate-with-directory-search-response", headers) do
+  def get("#{@base_url}/directory-search/res/netid/bas/" <> _uid, headers) do
     send_headers(headers)
     headers |> Enum.into(%{}) |> get_in(["webssotoken"]) |> directory_search_response()
   end

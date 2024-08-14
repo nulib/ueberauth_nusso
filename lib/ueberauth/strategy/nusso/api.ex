@@ -8,17 +8,17 @@ defmodule Ueberauth.Strategy.NuSSO.API do
 
   @doc "Returns the URL to the NuSSO server's login page"
   def login_url(callback) do
-    with {:ok, response} <- get("get-ldap-redirect-url", goto: callback) do
+    with {:ok, response} <- get("/agentless-websso/get-ldap-redirect-url", goto: callback) do
       response |> Map.get(:redirecturl)
     end
   end
 
   @doc "Redeem an NuSSO SSO Token for the user attributes"
   def redeem_token(token) do
-    case get("validateWebSSOToken", webssotoken: token) do
+    case get("/agentless-websso/validateWebSSOToken", webssotoken: token) do
       {:ok, %{netid: netid}} ->
         if settings(:include_attributes, false),
-          do: get_directory_attributes(token, %{uid: netid}),
+          do: get_directory_attributes(%{uid: netid}, token),
           else: {:ok, %{uid: netid}}
 
       other ->
@@ -41,9 +41,9 @@ defmodule Ueberauth.Strategy.NuSSO.API do
 
   defp consumer_key, do: settings(:consumer_key)
 
-  defp get_directory_attributes(token, extra) do
+  defp get_directory_attributes(%{uid: uid} = extra, token) do
     response =
-      case get("validate-with-directory-search-response", webssotoken: token) do
+      case get("/directory-search/res/netid/bas/#{uid}", webssotoken: token) do
         {:ok, response} -> response
         _ -> %{results: []}
       end
