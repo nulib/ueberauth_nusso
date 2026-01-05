@@ -51,14 +51,8 @@ defmodule Ueberauth.Strategy.NuSSO.API do
     {:ok, response |> handle_directory_attribute_response(extra)}
   end
 
-  defp handle_directory_attribute_response(%{results: []}, extra) do
-    extra[:uid] |> netid_user()
-  end
-
-  defp handle_directory_attribute_response(response, extra) do
-    response
-    |> Map.get(:results)
-    |> List.first()
+  defp handle_directory_attribute_response(%{results: [result | _]}, extra) do
+    result
     |> Enum.map(fn
       {_, []} -> nil
       {_, ""} -> nil
@@ -68,6 +62,10 @@ defmodule Ueberauth.Strategy.NuSSO.API do
     |> Enum.reject(&is_nil/1)
     |> Enum.into(%{})
     |> Map.merge(extra)
+  end
+
+  defp handle_directory_attribute_response(_, extra) do
+    extra[:uid] |> netid_user()
   end
 
   defp to_atom(key) when is_atom(key), do: key
@@ -87,37 +85,29 @@ defmodule Ueberauth.Strategy.NuSSO.API do
         {to_string(key), to_string(value)}
       end)
 
-    with client <- settings(:http_client, HTTPoison) do
-      url_for(path)
-      |> client.get(headers)
-      |> handle_response()
-    end
+    Req.new(base_url: settings(:base_url), url: path)
+    |> Req.get(headers: headers, decode_json: [keys: :atoms])
+    |> handle_response()
   end
 
-  defp handle_response({:ok, %HTTPoison.Response{status_code: 200, body: ""}}) do
+  defp handle_response({:ok, %Req.Response{status: 200, body: ""}}) do
     {:ok, %{results: []}}
   end
 
-  defp handle_response({:ok, %HTTPoison.Response{status_code: 200, body: body}}) do
-    Jason.decode(body, keys: :atoms)
+  defp handle_response({:ok, %Req.Response{status: 200, body: body}}) do
+    {:ok, body}
   end
 
-  defp handle_response({:ok, %HTTPoison.Response{status_code: 407}}) do
+  defp handle_response({:ok, %Req.Response{status: 407}}) do
     {:error, %{exception: "Login Failed", message: "Missing, invalid, or expired SSO Token"}}
   end
 
-  defp handle_response({:ok, %HTTPoison.Response{status_code: 500, body: @directory_failure}}) do
+  defp handle_response({:ok, %Req.Response{status: 500, body: @directory_failure}}) do
     {:ok, %{results: []}}
   end
 
-  defp handle_response({:ok, %HTTPoison.Response{status_code: status_code, body: body}}) do
+  defp handle_response({:ok, %Req.Response{status: status_code, body: body}}) do
     {:error, %{exception: "Unknown Response", status_code: status_code, message: body}}
-  end
-
-  defp url_for(path) do
-    settings(:base_url)
-    |> URI.merge(path)
-    |> URI.to_string()
   end
 
   defp netid_user(net_id) do

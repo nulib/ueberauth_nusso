@@ -1,6 +1,5 @@
 defmodule Ueberauth.Strategy.NuSSO.APITest do
   use ExUnit.Case
-  alias Ueberauth.NuSSO.MockEndpoint
   alias Ueberauth.Strategy.NuSSO.API
 
   describe "API" do
@@ -10,8 +9,6 @@ defmodule Ueberauth.Strategy.NuSSO.APITest do
         Application.put_env(:ueberauth, Ueberauth.Strategy.NuSSO, new_config)
         on_exit(fn -> Application.put_env(:ueberauth, Ueberauth.Strategy.NuSSO, old_config) end)
       end
-
-      Mox.stub_with(HTTPMock, MockEndpoint)
       :ok
     end
 

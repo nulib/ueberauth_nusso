@@ -1,14 +1,8 @@
 defmodule Ueberauth.Strategy.NuSSOTest do
   use ExUnit.Case
-  alias Ueberauth.NuSSO.MockEndpoint
   alias Ueberauth.Strategy.NuSSO
   import Plug.{Conn, Test}
   import Ueberauth.NuSSO.TestHelpers
-
-  setup do
-    Mox.stub_with(HTTPMock, MockEndpoint)
-    :ok
-  end
 
   describe "request phase" do
     setup tags do
