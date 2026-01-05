@@ -36,7 +36,7 @@ defmodule UeberauthOpenam.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :httpoison]
+      extra_applications: [:logger]
     ]
   end
 
@@ -47,9 +47,8 @@ defmodule UeberauthOpenam.MixProject do
       {:earmark, "~> 1.2", only: :docs},
       {:ex_doc, "~> 0.19", only: :docs},
       {:excoveralls, "~> 0.12", only: :test},
-      {:httpoison, ">= 0.0.0"},
       {:jason, "~> 1.0"},
-      {:mox, ">= 1.0.0", only: :test},
+      {:req, "~> 0.5.16"},
       {:ueberauth, "~> 0.10.0 and <= 0.10.5 or >= 0.10.7"}
     ]
   end

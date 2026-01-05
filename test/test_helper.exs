@@ -1,3 +1,3 @@
 ExUnit.start(capture_log: true)
-Mox.defmock(HTTPMock, for: HTTPoison.Base)
-[:mox, :plug] |> Enum.each(&Application.ensure_started/1)
+[:plug] |> Enum.each(&Application.ensure_started/1)
+Req.default_options(plug: Ueberauth.NuSSO.MockEndpoint, retry: false)
