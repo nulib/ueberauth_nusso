@@ -1,7 +1,7 @@
 defmodule UeberauthOpenam.MixProject do
   use Mix.Project
 
-  @version "2.3.1"
+  @version "2.3.2"
   @url "https://github.com/nulib/ueberauth_nusso"
 
   def project do
@@ -48,7 +48,7 @@ defmodule UeberauthOpenam.MixProject do
       {:ex_doc, "~> 0.19", only: :docs},
       {:excoveralls, "~> 0.12", only: :test},
       {:jason, "~> 1.0"},
-      {:req, "~> 0.6"},
+      {:req, "~> 0.7 and >= 0.7.3"},
       {:ueberauth, "~> 0.10.0 and <= 0.10.5 or >= 0.10.7"}
     ]
   end

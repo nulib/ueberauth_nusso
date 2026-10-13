@@ -86,7 +86,7 @@ defmodule Ueberauth.Strategy.NuSSO.API do
       end)
 
     Req.new(base_url: settings(:base_url), url: path)
-    |> Req.get(headers: headers, decode_json: [keys: :atoms])
+    |> Req.get(headers: headers, decoders: [json: &Jason.decode(&1, keys: :atoms)])
     |> handle_response()
   end
 
