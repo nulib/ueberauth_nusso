@@ -1,7 +1,7 @@
 defmodule UeberauthOpenam.MixProject do
   use Mix.Project
 
-  @version "2.3.2"
+  @version "2.4.0"
   @url "https://github.com/nulib/ueberauth_nusso"
 
   def project do
