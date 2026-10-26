@@ -8,7 +8,7 @@ defmodule Ueberauth.Strategy.NuSSO.API do
 
   @doc "Returns the URL to the NuSSO server's login page"
   def login_url(callback) do
-    with {:ok, response} <- get("/agentless-websso/get-ldap-duo-redirect-url", goto: callback) do
+    with {:ok, response} <- get(redirect_url(), goto: callback) do
       response |> Map.get(:redirecturl)
     end
   end
@@ -88,6 +88,14 @@ defmodule Ueberauth.Strategy.NuSSO.API do
     Req.new(base_url: settings(:base_url), url: path)
     |> Req.get(headers: headers, decoders: [json: &Jason.decode(&1, keys: :atoms)])
     |> handle_response()
+  end
+
+
+  defp redirect_url do
+    case settings(:require_mfa, true) do
+      false -> "/agentless-websso/get-ldap-redirect-url"
+      true -> "/agentless-websso/get-ldap-duo-redirect-url"
+    end
   end
 
   defp handle_response({:ok, %Req.Response{status: 200, body: ""}}) do

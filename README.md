@@ -36,7 +36,8 @@ config :ueberauth, Ueberauth,
 config :ueberauth, Ueberauth.Strategy.NuSSO,
   base_url: "http://websso.example.com/",
   consumer_key: "AGENTLESS_SSO_CONSUMER_KEY",
-  include_attributes: true
+  include_attributes: true,
+  require_mfa: true
 ```
 
   4. In `AuthController` use the NuSSO strategy in your `login/4` function:

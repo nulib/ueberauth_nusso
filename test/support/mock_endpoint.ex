@@ -27,11 +27,18 @@ defmodule Ueberauth.NuSSO.MockEndpoint do
 
   def call(conn, _opts), do: send_resp(conn, 405, "Method Not Allowed")
 
+  def get("/agentless-websso/get-ldap-redirect-url", conn) do
+    conn
+    |> fetch_query_params()
+    |> send_headers()
+    |> respond_json(200, %{redirecturl: redirect_url(conn, false) })
+  end
+
   def get("/agentless-websso/get-ldap-duo-redirect-url", conn) do
     conn
     |> fetch_query_params()
     |> send_headers()
-    |> respond_json(200, %{redirecturl: redirect_url(conn)})
+    |> respond_json(200, %{redirecturl: redirect_url(conn, true) })
   end
 
   def get("/agentless-websso/validateWebSSOToken", conn) do
@@ -50,9 +57,9 @@ defmodule Ueberauth.NuSSO.MockEndpoint do
 
   def get(_, conn), do: send_resp(conn, 404, "Not Found")
 
-  defp redirect_url(conn) do
+  defp redirect_url(conn, duo) do
     goto = conn |> param_or_header("goto") || ""
-    [@redirecturl, "goto=#{goto}"] |> Enum.join("&")
+    [@redirecturl, "goto=#{goto}", "duo=#{duo}"] |> Enum.join("&")
   end
 
   defp token(conn), do: param_or_header(conn, "webssotoken")
